@@ -13,8 +13,12 @@ namespace Elasticsearch.API.Repositories
             _client = client;
         }
 
-        public async Task<ImmutableList<Product>> GetAllAsync() { 
-        
+        public async Task<ImmutableList<Product>> GetAllAsync()
+        {
+
+            var result = await _client.SearchAsync<Product>(s => s.Index(IndexName).Query(q => q.MatchAll()));
+            foreach (var hit in result.Hits) hit.Source.Id = hit.Id;
+            return result.Documents.ToImmutableList();
         }
     }
 }
